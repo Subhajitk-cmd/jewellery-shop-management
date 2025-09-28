@@ -53,10 +53,18 @@ export default function NewOrder() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    const token = localStorage.getItem('token')
+    if (!token) {
+      alert('Please login first')
+      window.location.href = '/login'
+      return
+    }
+    
     try {
       const response = await axios.post('/api/orders/new', formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       })
       setSuccessMessage(`Order created successfully! Order ID: ${response.data.orderId}`)

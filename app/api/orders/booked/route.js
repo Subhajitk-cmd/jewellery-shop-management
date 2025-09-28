@@ -21,7 +21,7 @@ export async function GET(request) {
     const url = new URL(request.url)
     const metalType = url.searchParams.get('metalType')
     
-    const filter = { status: 'booked' }
+    const filter = { status: 'booked', userId: decoded.userId }
     if (metalType) {
       filter.metalType = metalType
     }
