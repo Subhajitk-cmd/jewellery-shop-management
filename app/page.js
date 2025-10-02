@@ -148,38 +148,49 @@ export default function Home() {
       </div>
 
       {user && (
-        <div className="dashboard">
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '2rem', marginTop: '2rem'}}>
+          {/* First Row - Gold Services */}
           <div className="dashboard-card" onClick={() => navigateTo('/new-order')} style={{background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(255, 215, 0, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>✦ New Order(Gold)</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>New Order(Gold)</h3>
             <p>Create a new jwellery order</p>
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/existing-orders')} style={{background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(255, 215, 0, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>✿ Existing Orders(Gold)</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Existing Orders(Gold)</h3>
             <p>View and manage existing orders</p>
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/gold-loan')} style={{background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(255, 215, 0, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>❀ Submit Items For Gold Loan</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Submit Items For Gold Loan</h3>
             <p>Submit jwellery items for gold loan</p>
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/deposited-gold')} style={{background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(255, 215, 0, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>❁ Search Deposited Gold</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Search Deposited Gold</h3>
             <p>Search and manage deposited gold items</p>
           </div>
+          <div className="dashboard-card" onClick={() => navigateTo('/reports')} style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', fontWeight: 'bold', color: '#fff', boxShadow: '0 8px 16px rgba(102, 126, 234, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Gold Reports & Analytics</h3>
+            <p>Monthly gold sales, orders & loan analytics</p>
+          </div>
+          
+          {/* Second Row - Silver Services */}
           <div className="dashboard-card" onClick={() => navigateTo('/new-order-silver')} style={{background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(192, 192, 192, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>❂ New Order(Silver)</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>New Order(Silver)</h3>
             <p>Create a new silver jwellery order</p>
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/existing-orders-silver')} style={{background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(192, 192, 192, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>❃ Existing Orders(Silver)</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Existing Orders(Silver)</h3>
             <p>View and manage existing silver orders</p>
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/silver-loan')} style={{background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(192, 192, 192, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>❄ Submit Items For Silver Loan</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Submit Items For Silver Loan</h3>
             <p>Submit jwellery items for silver loan</p>
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/deposited-silver')} style={{background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(192, 192, 192, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
-            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>❅ Search Deposited Silver</h3>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Search Deposited Silver</h3>
             <p>Search and manage deposited silver items</p>
+          </div>
+          <div className="dashboard-card" onClick={() => navigateTo('/reports-silver')} style={{background: 'linear-gradient(135deg, #6c757d 0%, #495057 100%)', fontWeight: 'bold', color: '#fff', boxShadow: '0 8px 16px rgba(108, 117, 125, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
+            <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Silver Reports & Analytics</h3>
+            <p>Monthly silver sales, orders & loan analytics</p>
           </div>
         </div>
       )}

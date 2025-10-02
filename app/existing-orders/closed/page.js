@@ -75,13 +75,13 @@ export default function ClosedOrders() {
     // Making charges
     doc.rect(10, 115, 190, 10)
     doc.text('Making Charges', 15, 122)
-    doc.text(`Rs.${order.makingCharge}`, 170, 122)
+    doc.text(`Rs.${order.actualMakingCharge || order.makingCharge}`, 170, 122)
     
     // Subtotal
     doc.rect(10, 125, 190, 10)
     doc.setFont(undefined, 'bold')
     doc.text('SUBTOTAL', 15, 132)
-    doc.text(`Rs.${parseInt(order.itemActualValue) + parseInt(order.makingCharge)}`, 170, 132)
+    doc.text(`Rs.${parseInt(order.itemActualValue) + parseInt(order.actualMakingCharge || order.makingCharge)}`, 170, 132)
     
     // Payment details
     doc.rect(10, 140, 190, 30)
@@ -92,13 +92,34 @@ export default function ClosedOrders() {
     doc.text(`Final Payment: Rs.${order.customerPaid}`, 15, 164)
     
     // Payment history
-    if (order.paymentHistory && order.paymentHistory.length > 0) {
+    const allPayments = []
+    
+    // Calculate initial advance from total advance minus payment history
+    const totalAdvance = parseFloat(order.advance) || 0
+    const additionalPayments = order.paymentHistory || []
+    const additionalTotal = additionalPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
+    const initialAdvance = totalAdvance - additionalTotal
+    
+    // Add initial advance if exists
+    if (initialAdvance > 0) {
+      allPayments.push({
+        amount: initialAdvance,
+        date: order.dateOfBooking
+      })
+    }
+    
+    // Add additional payment history
+    if (additionalPayments.length > 0) {
+      allPayments.push(...additionalPayments)
+    }
+    
+    if (allPayments.length > 0) {
       doc.rect(10, 175, 190, 40)
       doc.setFont(undefined, 'bold')
       doc.text('ADVANCE PAYMENT HISTORY:', 15, 185)
       doc.setFont(undefined, 'normal')
       let yPos = 192
-      order.paymentHistory.forEach((payment, index) => {
+      allPayments.forEach((payment, index) => {
         doc.text(`${index + 1}. Rs.${payment.amount} - ${new Date(payment.date).toLocaleDateString()}`, 15, yPos)
         yPos += 7
       })
@@ -167,8 +188,8 @@ export default function ClosedOrders() {
           <input type="text" value={'₹' + selectedOrder.advance} readOnly style={{backgroundColor: '#f5f5f5'}} />
         </div>
         <div className="form-group">
-          <label>Making Charge</label>
-          <input type="text" value={'₹' + selectedOrder.makingCharge} readOnly style={{backgroundColor: '#f5f5f5'}} />
+          <label>Actual Making Charge</label>
+          <input type="text" value={'₹' + (selectedOrder.actualMakingCharge || selectedOrder.makingCharge)} readOnly style={{backgroundColor: '#f5f5f5'}} />
         </div>
         <div className="form-group">
           <label>Customer Paid</label>
@@ -178,18 +199,33 @@ export default function ClosedOrders() {
           <label>Date of Delivery</label>
           <input type="text" value={new Date(selectedOrder.dateOfDelivery).toLocaleString()} readOnly style={{backgroundColor: '#f5f5f5'}} />
         </div>
-        {selectedOrder.paymentHistory && selectedOrder.paymentHistory.length > 0 && (
-          <div className="form-group">
-            <label>Advance Payment History</label>
-            <div style={{backgroundColor: '#f9f9f9', padding: '1rem', borderRadius: '4px', maxHeight: '200px', overflowY: 'auto'}}>
-              {selectedOrder.paymentHistory.map((payment, index) => (
-                <div key={index} style={{padding: '0.5rem', backgroundColor: '#fff8dc', margin: '0.25rem 0', borderRadius: '3px', border: '1px solid #FFD700'}}>
-                  <strong>₹{payment.amount}</strong> - {new Date(payment.date).toLocaleString()}
-                </div>
-              ))}
+        {(() => {
+          const allPayments = []
+          // Calculate initial advance from total advance minus payment history
+          const totalAdvance = parseFloat(selectedOrder.advance) || 0
+          const additionalPayments = selectedOrder.paymentHistory || []
+          const additionalTotal = additionalPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
+          const initialAdvance = totalAdvance - additionalTotal
+          
+          if (initialAdvance > 0) {
+            allPayments.push({ amount: initialAdvance, date: selectedOrder.dateOfBooking })
+          }
+          if (additionalPayments.length > 0) {
+            allPayments.push(...additionalPayments)
+          }
+          return allPayments.length > 0 && (
+            <div className="form-group">
+              <label>Advance Payment History</label>
+              <div style={{backgroundColor: '#f9f9f9', padding: '1rem', borderRadius: '4px', maxHeight: '200px', overflowY: 'auto'}}>
+                {allPayments.map((payment, index) => (
+                  <div key={index} style={{padding: '0.5rem', backgroundColor: '#fff8dc', margin: '0.25rem 0', borderRadius: '3px', border: '1px solid #FFD700'}}>
+                    <strong>₹{payment.amount}</strong> - {new Date(payment.date).toLocaleString()}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
         <div style={{display: 'flex', gap: '1rem'}}>
           <button className="btn" onClick={() => generateBill(selectedOrder)}>Generate Bill</button>
           <button className="btn" onClick={() => setSelectedOrder(null)}>Back</button>

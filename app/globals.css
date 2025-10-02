@@ -114,6 +114,12 @@ body {
   margin-top: 2rem;
 }
 
+@media (max-width: 1400px) {
+  .dashboard {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
   .dashboard {
     grid-template-columns: repeat(2, 1fr);
@@ -122,6 +128,32 @@ body {
 
 @media (max-width: 640px) {
   .dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 5-column grid for dashboard */
+.dashboard-5-col {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 1600px) {
+  .dashboard-5-col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-5-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-5-col {
     grid-template-columns: 1fr;
   }
 }

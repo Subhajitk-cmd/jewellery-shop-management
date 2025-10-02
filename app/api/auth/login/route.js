@@ -16,7 +16,15 @@ export async function POST(request) {
 
     const user = await users.findOne({ email })
     if (!user) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+      return NextResponse.json({ error: 'User not found. Please sign up first.' }, { status: 404 })
+    }
+
+    if (user.status === 'pending') {
+      return NextResponse.json({ error: 'Account pending admin approval' }, { status: 403 })
+    }
+
+    if (user.status === 'rejected') {
+      return NextResponse.json({ error: 'Account has been rejected' }, { status: 403 })
     }
 
     const isValidPassword = await verifyPassword(password, user.password)

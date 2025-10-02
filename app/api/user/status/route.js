@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import clientPromise from '../../../../lib/mongodb'
 import { verifyToken } from '../../../../lib/auth'
+import { ObjectId } from 'mongodb'
 
 export async function GET(request) {
   try {
@@ -16,29 +17,19 @@ export async function GET(request) {
 
     const client = await clientPromise
     const db = client.db('jewelry-shop')
-    const orders = db.collection('orders')
+    const users = db.collection('users')
 
-    const url = new URL(request.url)
-    const metalType = url.searchParams.get('metalType')
+    const user = await users.findOne({ _id: new ObjectId(decoded.userId) })
     
-    let filter = { status: 'booked', userId: decoded.userId }
-    
-    if (metalType === 'gold') {
-      filter.$or = [
-        { metalType: { $exists: false } },
-        { metalType: 'gold' },
-        { metalType: null }
-      ]
-    } else if (metalType === 'silver') {
-      filter.metalType = 'silver'
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const bookedOrders = await orders
-      .find(filter)
-      .sort({ dateOfBooking: -1 })
-      .toArray()
-
-    return NextResponse.json(bookedOrders)
+    return NextResponse.json({ 
+      status: user.status || 'pending',
+      name: user.name,
+      email: user.email
+    })
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

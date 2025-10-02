@@ -1,35 +1,7 @@
 import { NextResponse } from 'next/server'
-import { ObjectId } from 'mongodb'
 import clientPromise from '../../../../../lib/mongodb'
 import { verifyToken } from '../../../../../lib/auth'
-
-export async function GET(request, { params }) {
-  try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = verifyToken(token)
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
-
-    const { id } = params
-    const client = await clientPromise
-    const db = client.db('jewelry-shop')
-    const orders = db.collection('orders')
-
-    const order = await orders.findOne({ _id: new ObjectId(id) })
-    if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
-    }
-
-    return NextResponse.json(order)
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
+import { ObjectId } from 'mongodb'
 
 export async function PUT(request, { params }) {
   try {
@@ -44,53 +16,84 @@ export async function PUT(request, { params }) {
     }
 
     const updateData = await request.json()
-    const { id } = params
-
     const client = await clientPromise
     const db = client.db('jewelry-shop')
     const orders = db.collection('orders')
 
-    // Handle advance payment history
+    // Handle advance payment
     if (updateData.newAdvanceAmount) {
-      const currentOrder = await orders.findOne({ _id: new ObjectId(id) })
-      const paymentHistory = currentOrder.paymentHistory || []
-      paymentHistory.push({
-        amount: parseFloat(updateData.newAdvanceAmount),
-        date: new Date(),
-        type: 'advance'
-      })
+      const paymentEntry = {
+        amount: updateData.newAdvanceAmount,
+        date: updateData.newAdvanceDate ? new Date(updateData.newAdvanceDate) : new Date()
+      }
       
       await orders.updateOne(
-        { _id: new ObjectId(id) },
+        { _id: new ObjectId(params.id), userId: decoded.userId },
         { 
-          $set: { 
-            advance: updateData.advance,
-            paymentHistory: paymentHistory,
-            updatedAt: new Date()
-          }
+          $set: { advance: updateData.advance },
+          $push: { paymentHistory: paymentEntry }
         }
       )
     } else {
       // Regular update
-      const allowedFields = ['customerName', 'customerAddress', 'dateOfBooking', 'aadharId', 'itemName', 'itemEstimatedWeight', 'itemEstimatedValue', 'itemActualValue', 'itemActualWeight', 'advance', 'makingCharge', 'totalDue', 'customerPaid', 'dateOfDelivery', 'status']
-      const updatedOrder = {}
-      
-      allowedFields.forEach(field => {
-        if (updateData[field] !== undefined) {
-          updatedOrder[field] = updateData[field]
-        }
-      })
-      
-      updatedOrder.updatedAt = new Date()
-
+      const { _id, ...dataToUpdate } = updateData
       await orders.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updatedOrder }
+        { _id: new ObjectId(params.id), userId: decoded.userId },
+        { $set: dataToUpdate }
       )
     }
 
     return NextResponse.json({ message: 'Order updated successfully' })
   } catch (error) {
+    console.error('Update error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request, { params }) {
+  try {
+    console.log('Delete request for order:', params.id)
+    
+    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    if (!token) {
+      console.log('No token provided')
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const decoded = verifyToken(token)
+    if (!decoded) {
+      console.log('Invalid token')
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
+    console.log('User ID from token:', decoded.userId)
+
+    const client = await clientPromise
+    const db = client.db('jewelry-shop')
+    const orders = db.collection('orders')
+
+    // First check if order exists
+    const orderExists = await orders.findOne({ _id: new ObjectId(params.id) })
+    console.log('Order exists:', orderExists ? 'Yes' : 'No')
+    
+    if (!orderExists) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+    
+    // Delete the order (master login allows deleting any order)
+    const result = await orders.deleteOne({ 
+      _id: new ObjectId(params.id)
+    })
+
+    console.log('Delete result:', result)
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 })
+    }
+
+    return NextResponse.json({ message: 'Order deleted successfully' })
+  } catch (error) {
+    console.error('Delete error:', error)
+    return NextResponse.json({ error: 'Internal server error: ' + error.message }, { status: 500 })
   }
 }

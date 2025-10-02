@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { showToast } from '../utils/toast'
+import { showNotification } from '../components/ModernNotification'
 
 export default function NewOrder() {
   const [formData, setFormData] = useState({
@@ -56,8 +57,10 @@ export default function NewOrder() {
     
     const token = localStorage.getItem('token')
     if (!token) {
-      alert('Please login first')
-      window.location.href = '/login'
+      showNotification('Please login first', 'error')
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 2000)
       return
     }
     
@@ -67,13 +70,13 @@ export default function NewOrder() {
           Authorization: `Bearer ${token}`
         }
       })
-      setSuccessMessage(`Order created successfully! Order ID: ${response.data.orderId}`)
+      showNotification(`Order created successfully! Order ID: ${response.data.orderId}`, 'success')
       setTimeout(() => {
         window.location.href = '/'
-      }, 4000)
+      }, 3000)
     } catch (error) {
       setSuccessMessage('')
-      alert(error.response?.data?.error || 'An error occurred')
+      showNotification(error.response?.data?.error || 'An error occurred', 'error')
     }
   }
 
@@ -185,41 +188,6 @@ export default function NewOrder() {
           </select>
         </div>
         <button type="submit" className="btn">Submit Order</button>
-        {successMessage && (
-          <div style={{
-            marginTop: '1.5rem',
-            padding: '1.5rem',
-            background: 'linear-gradient(135deg, #00b894 0%, #00cec9 50%, #74b9ff 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '15px',
-            textAlign: 'center',
-            boxShadow: '0 8px 25px rgba(0, 184, 148, 0.3)',
-            fontSize: '1.1rem',
-            fontWeight: '600',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
-              animation: 'shimmer 2s infinite'
-            }}></div>
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              ✅ {successMessage}
-            </div>
-            <style jsx>{`
-              @keyframes shimmer {
-                0% { transform: translateX(-100%); }
-                100% { transform: translateX(100%); }
-              }
-            `}</style>
-          </div>
-        )}
       </form>
     </div>
   )

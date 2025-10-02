@@ -4,35 +4,39 @@ import { hashPassword } from '../../../../lib/auth'
 
 export async function POST(request) {
   try {
-    const { name, email, phone, password } = await request.json()
+    const { email, otp } = await request.json()
 
-    if (!name || !email || !phone || !password) {
-      return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
-    }
-
-    if (!/^\d{10}$/.test(phone)) {
-      return NextResponse.json({ error: 'Phone number must be exactly 10 digits' }, { status: 400 })
+    if (!email || !otp) {
+      return NextResponse.json({ error: 'Email and OTP are required' }, { status: 400 })
     }
 
     const client = await clientPromise
     const db = client.db('jewelry-shop')
-    const users = db.collection('users')
+    const otpCollection = db.collection('otpVerification')
 
-    const existingUser = await users.findOne({ email })
-    if (existingUser) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 400 })
+    const otpRecord = await otpCollection.findOne({ 
+      email, 
+      otp,
+      expiresAt: { $gt: new Date() }
+    })
+
+    if (!otpRecord) {
+      return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 })
     }
 
-    const hashedPassword = await hashPassword(password)
+    const hashedPassword = await hashPassword(otpRecord.password)
     
+    const users = db.collection('users')
     const result = await users.insertOne({
-      name,
-      email,
-      phone,
+      name: otpRecord.name,
+      email: otpRecord.email,
+      phone: otpRecord.phone,
       password: hashedPassword,
       status: 'pending',
       createdAt: new Date()
     })
+
+    await otpCollection.deleteOne({ _id: otpRecord._id })
 
     return NextResponse.json({ 
       message: 'Account created successfully! Please wait for admin approval to login.',

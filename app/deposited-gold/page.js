@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { showToast } from '../utils/toast'
+import MasterLogin from '../components/MasterLogin'
+import { showConfirmDialog, showNotification } from '../components/ModernNotification'
 
 export default function DepositedGold() {
   const [goldLoans, setGoldLoans] = useState([])
@@ -10,6 +12,7 @@ export default function DepositedGold() {
   const [editData, setEditData] = useState({})
   const [statusFilter, setStatusFilter] = useState('all')
   const [actionType, setActionType] = useState('')
+  const [isMasterLoggedIn, setIsMasterLoggedIn] = useState(false)
 
   useEffect(() => {
     fetchGoldLoans()
@@ -128,30 +131,33 @@ export default function DepositedGold() {
         }
       })
       
-      showToast(actionType === 'add_amount' ? 'Payment added successfully!' : 'Gold loan updated successfully!', 'success')
+      showNotification(actionType === 'add_amount' ? 'Payment added successfully!' : 'Gold loan updated successfully!', 'success')
       setSelectedLoan(null)
       setActionType('')
       fetchGoldLoans()
     } catch (error) {
       console.error('Update error:', error)
-      showToast('Error updating gold loan', 'error')
+      showNotification('Error updating gold loan', 'error')
     }
   }
 
   const handleDelete = async (loanId) => {
-    if (confirm('Are you sure you want to delete this gold loan?')) {
-      try {
-        await axios.delete(`/api/goldloan/search/${loanId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        })
-        showToast('Gold loan deleted successfully!', 'success')
-        fetchGoldLoans()
-      } catch (error) {
-        showToast('Error deleting gold loan', 'error')
+    showConfirmDialog(
+      'Are you sure you want to delete this gold loan?',
+      async () => {
+        try {
+          await axios.delete(`/api/goldloan/search/${loanId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          showNotification('Gold loan deleted successfully!', 'success')
+          fetchGoldLoans()
+        } catch (error) {
+          showNotification('Error deleting gold loan', 'error')
+        }
       }
-    }
+    )
   }
 
   if (selectedLoan) {
@@ -312,7 +318,10 @@ export default function DepositedGold() {
 
   return (
     <div>
-      <h2>Search Deposited Gold</h2>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
+        <h2>Search Deposited Gold</h2>
+        <MasterLogin onMasterLogin={setIsMasterLoggedIn} />
+      </div>
       <div className="search-container">
         <select
           value={statusFilter}
@@ -384,7 +393,7 @@ export default function DepositedGold() {
                   </button>
                 </>
               )}
-              {loan.status === 'pending' && (
+              {loan.status === 'pending' && isMasterLoggedIn && (
                 <button 
                   className="btn" 
                   style={{backgroundColor: '#e74c3c', fontSize: '0.9rem', padding: '0.3rem 0.6rem'}}
