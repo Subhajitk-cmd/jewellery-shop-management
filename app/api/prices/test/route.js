@@ -4,7 +4,7 @@ import clientPromise from '../../../../lib/mongodb'
 export async function GET() {
   try {
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const prices = db.collection('prices')
     
     // Get all price documents
@@ -26,7 +26,7 @@ export async function GET() {
 export async function POST() {
   try {
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const prices = db.collection('prices')
     
     // Force insert test data

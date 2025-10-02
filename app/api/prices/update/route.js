@@ -18,7 +18,7 @@ export async function PUT(request) {
     console.log('Updating prices:', { gold, silver })
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const prices = db.collection('prices')
 
     const result = await prices.updateOne(

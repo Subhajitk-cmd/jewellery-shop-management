@@ -4,7 +4,7 @@ import clientPromise from '../../../lib/mongodb'
 export async function GET() {
   try {
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const pricesCollection = db.collection('prices')
     
     const priceData = await pricesCollection.findOne({ type: 'current' })
