@@ -9,11 +9,14 @@ export async function GET() {
     
     // Get all price documents
     const allPrices = await prices.find({}).toArray()
+    const currentPrice = await prices.findOne({ _id: 'current_prices' })
     
     return NextResponse.json({
       success: true,
       allPrices,
-      dbName: db.databaseName
+      currentPrice,
+      dbName: db.databaseName,
+      connectionString: process.env.MONGODB_URI ? 'Set' : 'Not set'
     })
   } catch (error) {
     return NextResponse.json({
@@ -29,14 +32,16 @@ export async function POST() {
     const db = client.db('jewelryshop')
     const prices = db.collection('prices')
     
-    // Force insert test data
+    // Force insert test data with fixed _id
     const result = await prices.replaceOne(
-      { type: 'current' },
+      { _id: 'current_prices' },
       { 
+        _id: 'current_prices',
         type: 'current',
         gold: 70000,
         silver: 900,
         updatedAt: new Date(),
+        timestamp: Date.now(),
         testInsert: true
       },
       { upsert: true }

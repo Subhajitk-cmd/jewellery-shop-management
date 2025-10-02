@@ -18,33 +18,29 @@ export async function PUT(request) {
     const goldPrice = parseFloat(gold)
     const silverPrice = parseFloat(silver)
     
-    console.log('Updating prices:', { gold: goldPrice, silver: silverPrice })
-
     const client = await clientPromise
     const db = client.db('jewelryshop')
     const prices = db.collection('prices')
 
-    // Delete existing price document and insert new one
-    await prices.deleteMany({ type: 'current' })
-    const result = await prices.insertOne({
-      type: 'current',
-      gold: goldPrice,
-      silver: silverPrice,
-      updatedAt: new Date(),
-      timestamp: Date.now()
-    })
-
-    console.log('Insert result:', result)
-    
-    // Verify the data was saved
-    const savedData = await prices.findOne({ type: 'current' })
-    console.log('Verified saved data:', savedData)
+    // Use replaceOne with upsert for better Vercel compatibility
+    const result = await prices.replaceOne(
+      { _id: 'current_prices' },
+      {
+        _id: 'current_prices',
+        type: 'current',
+        gold: goldPrice,
+        silver: silverPrice,
+        updatedAt: new Date(),
+        timestamp: Date.now()
+      },
+      { upsert: true }
+    )
     
     return NextResponse.json({ 
       message: 'Prices updated successfully',
       gold: goldPrice,
       silver: silverPrice,
-      saved: savedData
+      result: result.acknowledged
     })
   } catch (error) {
     console.error('Price update error:', error)

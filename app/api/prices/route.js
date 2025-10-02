@@ -7,12 +7,8 @@ export async function GET() {
     const db = client.db('jewelryshop')
     const pricesCollection = db.collection('prices')
     
-    // Get the most recent price data
-    const priceData = await pricesCollection.findOne(
-      { type: 'current' },
-      { sort: { timestamp: -1 } }
-    )
-    console.log('Retrieved price data:', priceData)
+    // Get price data using fixed _id
+    const priceData = await pricesCollection.findOne({ _id: 'current_prices' })
     
     const prices = {
       gold: priceData?.gold || 67500,
@@ -27,8 +23,7 @@ export async function GET() {
     const prices = {
       gold: 67500,
       silver: 850,
-      fromDatabase: false,
-      error: error.message
+      fromDatabase: false
     }
     
     return NextResponse.json(prices)
