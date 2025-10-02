@@ -16,7 +16,7 @@ export async function GET(request) {
     }
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const users = db.collection('users')
 
     const user = await users.findOne({ _id: new ObjectId(decoded.userId) })

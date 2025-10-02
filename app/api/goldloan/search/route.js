@@ -15,7 +15,7 @@ export async function GET(request) {
     }
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const goldLoans = db.collection('goldLoans')
 
     const url = new URL(request.url)

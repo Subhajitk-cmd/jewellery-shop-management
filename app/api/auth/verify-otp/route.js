@@ -11,7 +11,7 @@ export async function POST(request) {
     }
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const otpCollection = db.collection('otpVerification')
 
     const otpRecord = await otpCollection.findOne({ 

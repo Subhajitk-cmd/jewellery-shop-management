@@ -22,7 +22,7 @@ export async function DELETE(request, { params }) {
     }
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const goldLoans = db.collection('goldLoans')
 
     const result = await goldLoans.deleteOne({ _id: new ObjectId(id) })

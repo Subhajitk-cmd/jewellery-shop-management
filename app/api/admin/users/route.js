@@ -10,7 +10,7 @@ export async function GET(request) {
     }
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const users = db.collection('users')
 
     const allUsers = await users
@@ -34,7 +34,7 @@ export async function PUT(request) {
     const { userId, action } = await request.json()
     
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const users = db.collection('users')
 
     const status = action === 'approve' ? 'approved' : 'rejected'
@@ -67,7 +67,7 @@ export async function DELETE(request) {
     const { userId } = await request.json()
     
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const users = db.collection('users')
 
     await users.deleteOne({ _id: new ObjectId(userId) })

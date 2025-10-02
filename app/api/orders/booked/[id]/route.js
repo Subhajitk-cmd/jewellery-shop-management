@@ -17,7 +17,7 @@ export async function PUT(request, { params }) {
 
     const updateData = await request.json()
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const orders = db.collection('orders')
 
     // Handle advance payment
@@ -69,7 +69,7 @@ export async function DELETE(request, { params }) {
     console.log('User ID from token:', decoded.userId)
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const orders = db.collection('orders')
 
     // First check if order exists

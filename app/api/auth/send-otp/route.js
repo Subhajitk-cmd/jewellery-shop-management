@@ -20,7 +20,7 @@ export async function POST(request) {
     }
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const users = db.collection('users')
 
     const existingUser = await users.findOne({ 

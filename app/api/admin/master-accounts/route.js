@@ -10,7 +10,7 @@ export async function GET(request) {
     }
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const masterAuth = db.collection('masterAuth')
     const users = db.collection('users')
 
@@ -60,7 +60,7 @@ export async function PUT(request) {
     const { userId, action } = await request.json()
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const masterAuth = db.collection('masterAuth')
 
     if (action === 'unlock') {

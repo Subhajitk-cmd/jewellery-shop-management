@@ -7,7 +7,7 @@ export async function POST(request) {
     const { action, password, newPassword, email, otp, userId } = await request.json()
 
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const masterAuth = db.collection('masterAuth')
 
     if (action === 'login') {

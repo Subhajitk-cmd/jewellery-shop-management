@@ -17,7 +17,7 @@ export async function POST(request) {
     const loanData = await request.json()
     
     const client = await clientPromise
-    const db = client.db('jewelry-shop')
+    const db = client.db('jewelryshop')
     const goldLoans = db.collection('goldLoans')
 
     const newLoan = {
