@@ -18,10 +18,21 @@ export default function Home() {
 
   const fetchPrices = async () => {
     try {
-      // Fetch real-time prices
-      const response = await axios.get('/api/prices/realtime')
+      const token = localStorage.getItem('token')
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      
+      // Fetch real-time prices with token
+      const response = await axios.get('/api/prices/realtime', { headers })
       setPrices(response.data)
       setEditPrices(response.data)
+      
+      // Show usage info if available
+      if (response.data.remainingCalls !== undefined) {
+        console.log(`API calls remaining today: ${response.data.remainingCalls}`)
+      }
+      if (response.data.message) {
+        alert(response.data.message)
+      }
     } catch (error) {
       console.error('Error fetching real-time prices:', error)
       // Fallback to simple API
