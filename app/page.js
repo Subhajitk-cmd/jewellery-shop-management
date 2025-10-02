@@ -19,27 +19,66 @@ export default function Home() {
   const fetchPrices = async () => {
     try {
       const response = await axios.get(`/api/prices?t=${Date.now()}`)
+      console.log('Fetched prices:', response.data)
+      
+      // If database fetch fails, try localStorage backup
+      if (!response.data.fromDatabase) {
+        const backup = localStorage.getItem('lastPrices')
+        if (backup) {
+          const backupData = JSON.parse(backup)
+          // Use backup if it's less than 24 hours old
+          if (Date.now() - backupData.timestamp < 24 * 60 * 60 * 1000) {
+            setPrices({ gold: backupData.gold, silver: backupData.silver })
+            setEditPrices({ gold: backupData.gold, silver: backupData.silver })
+            return
+          }
+        }
+      }
+      
       setPrices(response.data)
       setEditPrices(response.data)
     } catch (error) {
       console.error('Error fetching prices:', error)
+      // Try localStorage backup on error
+      const backup = localStorage.getItem('lastPrices')
+      if (backup) {
+        const backupData = JSON.parse(backup)
+        setPrices({ gold: backupData.gold, silver: backupData.silver })
+        setEditPrices({ gold: backupData.gold, silver: backupData.silver })
+      }
     }
   }
 
   const handlePriceUpdate = async () => {
     try {
-      await axios.put('/api/prices/update', editPrices, {
+      const response = await axios.put('/api/prices/update', editPrices, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       })
+      
+      // Store in localStorage as backup
+      localStorage.setItem('lastPrices', JSON.stringify({
+        gold: editPrices.gold,
+        silver: editPrices.silver,
+        timestamp: Date.now()
+      }))
+      
       setPrices(editPrices)
       setEditMode(false)
       alert('Prices updated successfully!')
-      // Refresh prices from database to ensure consistency
-      setTimeout(fetchPrices, 1000)
+      
+      // Verify the update worked
+      setTimeout(async () => {
+        const verifyResponse = await axios.get(`/api/prices?verify=${Date.now()}`)
+        console.log('Verification response:', verifyResponse.data)
+        if (verifyResponse.data.fromDatabase) {
+          setPrices(verifyResponse.data)
+        }
+      }, 2000)
     } catch (error) {
-      alert('Error updating prices')
+      console.error('Price update error:', error)
+      alert('Error updating prices: ' + (error.response?.data?.details || error.message))
     }
   }
 

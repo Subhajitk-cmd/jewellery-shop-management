@@ -7,12 +7,18 @@ export async function GET() {
     const db = client.db('jewelryshop')
     const pricesCollection = db.collection('prices')
     
-    const priceData = await pricesCollection.findOne({ type: 'current' })
+    // Get the most recent price data
+    const priceData = await pricesCollection.findOne(
+      { type: 'current' },
+      { sort: { timestamp: -1 } }
+    )
     console.log('Retrieved price data:', priceData)
     
     const prices = {
       gold: priceData?.gold || 67500,
-      silver: priceData?.silver || 850
+      silver: priceData?.silver || 850,
+      lastUpdated: priceData?.updatedAt,
+      fromDatabase: !!priceData
     }
     
     return NextResponse.json(prices)
@@ -20,7 +26,9 @@ export async function GET() {
     console.error('Price fetch error:', error)
     const prices = {
       gold: 67500,
-      silver: 850
+      silver: 850,
+      fromDatabase: false,
+      error: error.message
     }
     
     return NextResponse.json(prices)
