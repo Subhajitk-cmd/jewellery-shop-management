@@ -15,12 +15,13 @@ export async function PUT(request) {
     }
 
     const { gold, silver } = await request.json()
+    console.log('Updating prices:', { gold, silver })
 
     const client = await clientPromise
     const db = client.db('jewelry-shop')
     const prices = db.collection('prices')
 
-    await prices.updateOne(
+    const result = await prices.updateOne(
       { type: 'current' },
       { 
         $set: { 
@@ -32,8 +33,14 @@ export async function PUT(request) {
       { upsert: true }
     )
 
-    return NextResponse.json({ message: 'Prices updated successfully' })
+    console.log('Update result:', result)
+    return NextResponse.json({ 
+      message: 'Prices updated successfully',
+      gold: parseFloat(gold),
+      silver: parseFloat(silver)
+    })
   } catch (error) {
+    console.error('Price update error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

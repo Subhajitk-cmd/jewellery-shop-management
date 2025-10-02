@@ -8,6 +8,7 @@ export async function GET() {
     const pricesCollection = db.collection('prices')
     
     const priceData = await pricesCollection.findOne({ type: 'current' })
+    console.log('Retrieved price data:', priceData)
     
     const prices = {
       gold: priceData?.gold || 67500,
@@ -16,6 +17,7 @@ export async function GET() {
     
     return NextResponse.json(prices)
   } catch (error) {
+    console.error('Price fetch error:', error)
     const prices = {
       gold: 67500,
       silver: 850
