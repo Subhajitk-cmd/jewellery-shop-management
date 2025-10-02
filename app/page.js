@@ -18,20 +18,19 @@ export default function Home() {
 
   const fetchPrices = async () => {
     try {
-      // Try simple API first
-      const response = await axios.get('/api/prices/simple')
+      // Fetch real-time prices
+      const response = await axios.get('/api/prices/realtime')
       setPrices(response.data)
       setEditPrices(response.data)
     } catch (error) {
-      console.error('Error fetching prices:', error)
-      // Use localStorage backup
-      const backup = localStorage.getItem('lastPrices')
-      if (backup) {
-        const backupData = JSON.parse(backup)
-        setPrices({ gold: backupData.gold, silver: backupData.silver })
-        setEditPrices({ gold: backupData.gold, silver: backupData.silver })
-      } else {
-        // Default values
+      console.error('Error fetching real-time prices:', error)
+      // Fallback to simple API
+      try {
+        const fallbackResponse = await axios.get('/api/prices/simple')
+        setPrices(fallbackResponse.data)
+        setEditPrices(fallbackResponse.data)
+      } catch (fallbackError) {
+        // Final fallback to default values
         setPrices({ gold: 67500, silver: 850 })
         setEditPrices({ gold: 67500, silver: 850 })
       }
@@ -131,10 +130,10 @@ export default function Home() {
       </div>
       
       <div className="price-section">
-        <h2>Current Metal Prices</h2>
+        <h2>Current Metal Prices {prices.isRealTime && <span style={{color: '#28a745', fontSize: '0.8rem'}}>● LIVE</span>}</h2>
         <div className="price-grid">
           <div className="price-card">
-            <h3>Gold Price</h3>
+            <h3>Gold Price (22K)</h3>
             {editMode ? (
               <input
                 type="number"
@@ -143,7 +142,14 @@ export default function Home() {
                 style={{padding: '0.5rem', fontSize: '1.2rem', width: '120px'}}
               />
             ) : (
-              <div className="price">₹{prices.gold}/10g</div>
+              <>
+                <div className="price">₹{prices.gold}/gram</div>
+                {prices.gold24K && (
+                  <div style={{fontSize: '0.9rem', color: '#666', marginTop: '0.5rem'}}>
+                    24K: ₹{prices.gold24K}/gram
+                  </div>
+                )}
+              </>
             )}
           </div>
           <div className="price-card">
@@ -156,19 +162,27 @@ export default function Home() {
                 style={{padding: '0.5rem', fontSize: '1.2rem', width: '120px'}}
               />
             ) : (
-              <div className="price">₹{prices.silver}/10g</div>
+              <div className="price">₹{prices.silver}/gram</div>
             )}
           </div>
         </div>
+        {prices.lastUpdated && (
+          <p style={{textAlign: 'center', fontSize: '0.9rem', color: '#666', marginTop: '0.5rem'}}>
+            Last updated: {new Date(prices.lastUpdated).toLocaleString()}
+          </p>
+        )}
         {user && (
           <div style={{textAlign: 'center', marginTop: '1rem'}}>
             {editMode ? (
               <>
-                <button className="btn" onClick={handlePriceUpdate} style={{marginRight: '0.5rem'}}>Save Prices</button>
+                <button className="btn" onClick={handlePriceUpdate} style={{marginRight: '0.5rem'}}>Save Custom Prices</button>
                 <button className="btn" onClick={() => setEditMode(false)}>Cancel</button>
               </>
             ) : (
-              <button className="btn" onClick={() => setEditMode(true)}>Edit Prices</button>
+              <>
+                <button className="btn" onClick={() => setEditMode(true)} style={{marginRight: '0.5rem'}}>Set Custom Prices</button>
+                <button className="btn" onClick={fetchPrices}>Refresh Prices</button>
+              </>
             )}
           </div>
         )}

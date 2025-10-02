@@ -8,15 +8,20 @@ export async function GET() {
     if (response.ok) {
       const data = await response.json()
       
-      // Convert from per ounce to per gram
-      const gold = Math.round((1 / data.rates.XAU) / 31.1035)
+      // Convert from per ounce to per gram and calculate prices
+      const gold24K = Math.round((1 / data.rates.XAU) / 31.1035)
+      const gold22K = Math.round(gold24K * 0.916) // 22K is 91.6% pure
       const silver = Math.round((1 / data.rates.XAG) / 31.1035)
       
       return NextResponse.json({
-        gold: gold,
+        gold: gold22K,
+        gold22K: gold22K,
+        gold24K: gold24K,
         silver: silver,
         lastUpdated: new Date().toISOString(),
-        source: 'metalpriceapi.com'
+        isRealTime: true,
+        source: 'metalpriceapi.com',
+        unit: 'per gram'
       })
     }
   } catch (error) {
@@ -25,8 +30,13 @@ export async function GET() {
   
   // Fallback to fixed prices
   return NextResponse.json({
-    gold: 11000,
+    gold: 10000,
+    gold22K: 10000,
+    gold24K: 11000,
     silver: 850,
-    source: 'fallback'
+    lastUpdated: new Date().toISOString(),
+    isRealTime: false,
+    source: 'fallback',
+    unit: 'per gram'
   })
 }

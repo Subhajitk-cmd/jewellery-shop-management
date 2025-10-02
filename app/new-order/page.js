@@ -32,7 +32,7 @@ export default function NewOrder() {
 
   const fetchGoldPrice = async () => {
     try {
-      const response = await axios.get('/api/prices/simple')
+      const response = await axios.get('/api/prices/realtime')
       setGoldPrice(response.data.gold)
     } catch (error) {
       console.error('Error fetching gold price:', error)
@@ -50,7 +50,7 @@ export default function NewOrder() {
     // Auto-calculate estimated value when weight changes
     if (name === 'itemEstimatedWeight' && value && goldPrice) {
       const weightInGrams = parseFloat(value)
-      const estimatedValue = Math.round((weightInGrams / 10) * goldPrice)
+      const estimatedValue = Math.round(weightInGrams * goldPrice) // Direct per gram calculation
       updatedData.itemEstimatedValue = estimatedValue
     }
     
@@ -147,16 +147,6 @@ export default function NewOrder() {
             onChange={handleChange}
             required
           />
-          <small style={{color: '#666', fontSize: '0.9rem'}}>
-            Current Gold Price: ₹{goldPrice}/10g 
-            <button 
-              type="button" 
-              onClick={fetchGoldPrice}
-              style={{marginLeft: '10px', padding: '2px 8px', fontSize: '0.8rem', cursor: 'pointer'}}
-            >
-              Refresh
-            </button>
-          </small>
         </div>
         <div className="form-group">
           <label>Item Estimated Value (₹) *</label>
@@ -165,8 +155,6 @@ export default function NewOrder() {
             name="itemEstimatedValue"
             value={formData.itemEstimatedValue}
             onChange={handleChange}
-            readOnly
-            style={{backgroundColor: '#f5f5f5'}}
             required
           />
         </div>
