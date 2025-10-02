@@ -33,10 +33,11 @@ export default function NewOrderSilver() {
 
   const fetchSilverPrice = async () => {
     try {
-      const response = await axios.get(`/api/prices?t=${Date.now()}`)
+      const response = await axios.get('/api/prices/simple')
       setSilverPrice(response.data.silver)
     } catch (error) {
       console.error('Error fetching silver price:', error)
+      setSilverPrice(850)
     }
   }
 

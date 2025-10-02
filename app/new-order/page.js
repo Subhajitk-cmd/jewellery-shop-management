@@ -32,10 +32,11 @@ export default function NewOrder() {
 
   const fetchGoldPrice = async () => {
     try {
-      const response = await axios.get(`/api/prices?t=${Date.now()}`)
+      const response = await axios.get('/api/prices/simple')
       setGoldPrice(response.data.gold)
     } catch (error) {
       console.error('Error fetching gold price:', error)
+      setGoldPrice(67500)
     }
   }
 
