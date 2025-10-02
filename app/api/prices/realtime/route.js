@@ -7,7 +7,14 @@ export async function GET(request) {
   try {
     // Get user from token and IP for guest tracking
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    const clientIP = request.headers.get('x-forwarded-for') || 'unknown'
+    
+    // Multiple IP detection methods for Vercel
+    const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+                     request.headers.get('x-real-ip') || 
+                     request.headers.get('cf-connecting-ip') ||
+                     request.ip ||
+                     'unknown'
+    
     let userId = null
     let userCallsUsed = 0
     let guestCallsUsed = 0
@@ -47,7 +54,8 @@ export async function GET(request) {
     
     // Check guest usage limit (2 calls per IP per day)
     if (!userId) {
-      const guestUsage = await usageCollection.findOne({ guestIP: clientIP, date: today })
+      const guestId = `guest_${clientIP}`
+      const guestUsage = await usageCollection.findOne({ guestId, date: today })
       guestCallsUsed = guestUsage?.count || 0
       
       if (guestCallsUsed >= 2) {
@@ -83,8 +91,9 @@ export async function GET(request) {
           { upsert: true }
         )
       } else {
+        const guestId = `guest_${clientIP}`
         await usageCollection.updateOne(
-          { guestIP: clientIP, date: today },
+          { guestId, date: today },
           { $inc: { count: 1 } },
           { upsert: true }
         )
@@ -99,7 +108,8 @@ export async function GET(request) {
         isRealTime: true,
         source: 'metalpriceapi.com',
         unit: 'per gram',
-        remainingCalls: userId ? (4 - userCallsUsed) : (1 - guestCallsUsed)
+        remainingCalls: userId ? (4 - userCallsUsed) : (1 - guestCallsUsed),
+        debug: { clientIP, userId: !!userId }
       })
     }
   } catch (error) {
