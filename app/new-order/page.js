@@ -24,11 +24,15 @@ export default function NewOrder() {
     const now = new Date().toISOString().slice(0, 16)
     setFormData(prev => ({ ...prev, dateOfBooking: now }))
     fetchGoldPrice()
+    
+    // Refresh price every 30 seconds
+    const interval = setInterval(fetchGoldPrice, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   const fetchGoldPrice = async () => {
     try {
-      const response = await axios.get('/api/prices')
+      const response = await axios.get(`/api/prices?t=${Date.now()}`)
       setGoldPrice(response.data.gold)
     } catch (error) {
       console.error('Error fetching gold price:', error)
@@ -142,6 +146,16 @@ export default function NewOrder() {
             onChange={handleChange}
             required
           />
+          <small style={{color: '#666', fontSize: '0.9rem'}}>
+            Current Gold Price: ₹{goldPrice}/10g 
+            <button 
+              type="button" 
+              onClick={fetchGoldPrice}
+              style={{marginLeft: '10px', padding: '2px 8px', fontSize: '0.8rem', cursor: 'pointer'}}
+            >
+              Refresh
+            </button>
+          </small>
         </div>
         <div className="form-group">
           <label>Item Estimated Value (₹) *</label>

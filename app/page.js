@@ -18,7 +18,7 @@ export default function Home() {
 
   const fetchPrices = async () => {
     try {
-      const response = await axios.get('/api/prices')
+      const response = await axios.get(`/api/prices?t=${Date.now()}`)
       setPrices(response.data)
       setEditPrices(response.data)
     } catch (error) {
@@ -36,6 +36,8 @@ export default function Home() {
       setPrices(editPrices)
       setEditMode(false)
       alert('Prices updated successfully!')
+      // Refresh prices from database to ensure consistency
+      setTimeout(fetchPrices, 1000)
     } catch (error) {
       alert('Error updating prices')
     }

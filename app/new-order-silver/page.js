@@ -25,11 +25,15 @@ export default function NewOrderSilver() {
     const now = new Date().toISOString().slice(0, 16)
     setFormData(prev => ({ ...prev, dateOfBooking: now }))
     fetchSilverPrice()
+    
+    // Refresh price every 30 seconds
+    const interval = setInterval(fetchSilverPrice, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   const fetchSilverPrice = async () => {
     try {
-      const response = await axios.get('/api/prices')
+      const response = await axios.get(`/api/prices?t=${Date.now()}`)
       setSilverPrice(response.data.silver)
     } catch (error) {
       console.error('Error fetching silver price:', error)
@@ -134,6 +138,16 @@ export default function NewOrderSilver() {
             onChange={handleChange}
             required
           />
+          <small style={{color: '#666', fontSize: '0.9rem'}}>
+            Current Silver Price: ₹{silverPrice}/10g 
+            <button 
+              type="button" 
+              onClick={fetchSilverPrice}
+              style={{marginLeft: '10px', padding: '2px 8px', fontSize: '0.8rem', cursor: 'pointer'}}
+            >
+              Refresh
+            </button>
+          </small>
         </div>
         <div className="form-group">
           <label>Item Estimated Value (₹) *</label>
