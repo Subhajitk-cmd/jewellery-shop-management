@@ -175,7 +175,7 @@ export default function Home() {
       </div>
 
       {user && (
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '2rem', marginTop: '2rem'}}>
+        <div className="dashboard-mobile-responsive">
           {/* First Row - Gold Services */}
           <div className="dashboard-card" onClick={() => navigateTo('/new-order')} style={{background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', fontWeight: 'bold', color: '#000', boxShadow: '0 8px 16px rgba(255, 215, 0, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
             <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>New Order(Gold)</h3>
@@ -195,7 +195,7 @@ export default function Home() {
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/reports')} style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', fontWeight: 'bold', color: '#fff', boxShadow: '0 8px 16px rgba(102, 126, 234, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
             <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Gold Reports & Analytics</h3>
-            <p>Monthly gold sales, orders & loan analytics</p>
+            <p style={{color: '#000'}}>Monthly gold sales, orders & loan analytics</p>
           </div>
           
           {/* Second Row - Silver Services */}
@@ -217,7 +217,7 @@ export default function Home() {
           </div>
           <div className="dashboard-card" onClick={() => navigateTo('/reports-silver')} style={{background: 'linear-gradient(135deg, #6c757d 0%, #495057 100%)', fontWeight: 'bold', color: '#fff', boxShadow: '0 8px 16px rgba(108, 117, 125, 0.3)', transform: 'translateY(-2px)', transition: 'all 0.3s ease'}}>
             <h3 style={{textShadow: '1px 1px 2px rgba(0,0,0,0.1)'}}>Silver Reports & Analytics</h3>
-            <p>Monthly silver sales, orders & loan analytics</p>
+            <p style={{color: '#000'}}>Monthly silver sales, orders & loan analytics</p>
           </div>
         </div>
       )}
